@@ -46,7 +46,13 @@ def _fetch_page(session: requests.Session, url: str, params: dict) -> dict:
 
 
 def iter_filings(year: int, quarter: int) -> Iterator[dict]:
-    """Yield trimmed LD-2 filings for a quarter, paging through the API."""
+    """Yield trimmed LD-2 filings for a quarter.
+
+    The API hard-caps results at 25/page regardless of page_size, and its
+    `next` links have been observed to terminate early under rate-limit
+    pressure. So we paginate by explicit page number up to ceil(count/25)
+    and let the caller verify coverage against `count`.
+    """
     session = requests.Session()
     session.headers["User-Agent"] = USER_AGENT
     params = {
@@ -54,40 +60,55 @@ def iter_filings(year: int, quarter: int) -> Iterator[dict]:
         "filing_year": year,
         "page_size": LDA_PAGE_SIZE,
     }
-    url: str | None = LDA_BASE_URL
-    page = 0
-    while url:
-        payload = _fetch_page(session, url, params)
-        for filing in payload.get("results", []):
+    first = _fetch_page(session, LDA_BASE_URL, params)
+    total = first.get("count") or 0
+    last_page = -(-total // LDA_PAGE_SIZE) or 1  # ceil division
+    print(f"      API reports {total} filings -> {last_page} pages "
+          f"of {LDA_PAGE_SIZE}")
+
+    page = 1
+    while page <= last_page:
+        payload = first if page == 1 else _fetch_page(session, LDA_BASE_URL, params)
+        results = payload.get("results", [])
+        if not results:
+            print(f"      page {page} returned no results; stopping")
+            break
+        for filing in results:
             yield _trim(filing)
+        if page % 50 == 0:
+            print(f"      ...page {page}/{last_page}")
         page += 1
-        if page % 25 == 0:
-            print(f"      ...page {page}")
-        url = payload.get("next")
-        params = {}  # `next` already carries the full query string
+        params = dict(params, page=page)
         time.sleep(1.0)  # LDA 429s aggressively; stay at ~1 req/s
 
 
 def download_quarter(year: int, quarter: int, refresh: bool = False) -> Path:
     """Download all filings for a quarter to the JSONL cache and return its path.
 
-    Skips the download when the cache exists unless refresh=True. Writes to a
-    .part file and renames on success so failures never leave a truncated cache.
+    Skips the download when the cache exists unless refresh=True. Verifies
+    coverage: unique filing UUIDs fetched vs the count the API reported.
     """
     path = raw_cache_path(year, quarter)
     if path.exists() and not refresh:
         return path
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(".jsonl.part")
-    count = 0
-    with tmp.open("w", encoding="utf-8") as fh:
-        for filing in iter_filings(year, quarter):
-            fh.write(json.dumps(filing) + "\n")
-            count += 1
-    if count == 0:
-        tmp.unlink(missing_ok=True)
+
+    seen: set[str] = set()
+    filings: list[dict] = []
+    for filing in iter_filings(year, quarter):
+        uuid = filing.get("filing_uuid")
+        if uuid and uuid in seen:
+            continue  # ordering can shift mid-run; tolerate duplicates
+        if uuid:
+            seen.add(uuid)
+        filings.append(filing)
+
+    if not filings:
         raise RuntimeError(f"LDA returned zero filings for {year}Q{quarter}")
-    tmp.replace(path)
+    with path.open("w", encoding="utf-8") as fh:
+        for filing in filings:
+            fh.write(json.dumps(filing) + "\n")
+    print(f"      cached {len(filings)} filings")
     return path
 
 

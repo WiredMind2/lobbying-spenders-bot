@@ -8,10 +8,10 @@ dashboard.
 
 | ID | Title | Points | Status |
 |----|-------|--------|--------|
-| [US-001](items/US-001.md) | Cache quarterly LDA filings locally | 5 | Ready |
-| [US-002](items/US-002.md) | Map lobbying clients to stock tickers | 5 | Ready |
-| [US-003](items/US-003.md) | Compute top-10 equal-weight portfolio targets | 3 | Ready |
-| [US-004](items/US-004.md) | Web dashboard for signal and portfolio | 5 | Ready |
+| [US-001](items/US-001.md) | Cache quarterly LDA filings locally | 5 | Done |
+| [US-002](items/US-002.md) | Map lobbying clients to stock tickers | 5 | In progress (live EDGAR fetch unverified: SEC 403 blocked this IP all session) |
+| [US-003](items/US-003.md) | Compute top-10 equal-weight portfolio targets | 3 | Done |
+| [US-004](items/US-004.md) | Web dashboard for signal and portfolio | 5 | Done |
 
 ## Epics / icebox
 

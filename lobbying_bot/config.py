@@ -12,7 +12,8 @@ RAW_DIR = DATA_DIR / "raw"
 # Quarterly LD-2 activity reports are filing_type=Q1..Q4. Firms report `income`
 # (what the client paid them); in-house lobbying filings report `expenses`.
 LDA_BASE_URL = "https://lda.gov/api/v1/filings/"
-LDA_PAGE_SIZE = 100
+# The API hard-caps results at 25/page regardless of the requested page_size.
+LDA_PAGE_SIZE = 25
 # Be polite: LDA/SEC both want a identifying User-Agent.
 USER_AGENT = "lobbying-spenders-bot/0.1 (github.com/WiredMind2/lobbying-spenders-bot)"
 

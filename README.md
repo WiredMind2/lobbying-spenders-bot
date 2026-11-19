@@ -71,8 +71,12 @@ python -m pytest
 ## Status / roadmap
 
 - [x] US-001 quarterly LDA ingestion with cache
-- [x] US-002 client → ticker mapping (EDGAR + overrides)
+- [~] US-002 client → ticker mapping (logic done + unit-tested; live EDGAR
+      fetch unverified — SEC rate-limited (403) the build machine's IP for the
+      whole session; seeded `mappings_overrides.csv` covers 2026Q3's public
+      top-30)
 - [x] US-003 top-10 equal-weight targets
 - [x] US-004 web dashboard
 - [ ] Icebox: point-in-time backtest (2009→, bulk LDA XML archives, vs SPY)
 - [ ] Icebox: Alpaca paper-trading executor on the monthly rebalance date
+- [ ] Icebox: subsidiary rollup (one parent company per name group)
