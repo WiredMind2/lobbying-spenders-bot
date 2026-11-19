@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top Lobbying Spenders — strategy dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <h1>Top Lobbying Spenders</h1>
+    <p class="subtitle">
+      Equal-weight top-10 US companies by quarterly lobbying spend (LDA LD-2),
+      rebalanced monthly. Replication of the QuiverQuant strategy.
+    </p>
+    <p id="meta" class="meta" aria-live="polite">Loading…</p>
+  </header>
+
+  <main>
+    <section aria-labelledby="spenders-heading">
+      <h2 id="spenders-heading">Quarterly spend ranking</h2>
+      <p class="hint">
+        Spend = income paid to lobbying firms + in-house expenses. Filers round
+        amounts to the nearest $10,000, so exact ties occur. “Unmapped” clients
+        (associations, private firms) are excluded from the portfolio.
+      </p>
+      <div class="table-wrapper" tabindex="0" role="region"
+           aria-labelledby="spenders-heading">
+        <table id="spenders-table">
+          <caption class="visually-hidden" id="spenders-caption">
+            Lobbying spend by client for the selected quarter
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Client</th>
+              <th scope="col">Spend</th>
+              <th scope="col">Filings</th>
+              <th scope="col">Ticker</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="portfolio-heading">
+      <h2 id="portfolio-heading">Target portfolio (equal weight)</h2>
+      <p id="rebalance-info" class="hint"></p>
+      <ul id="portfolio-list" class="portfolio-grid"></ul>
+    </section>
+
+    <section aria-labelledby="notes-heading" class="notes">
+      <h2 id="notes-heading">Notes & caveats</h2>
+      <ul id="notes-list"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Data: <a href="https://lda.gov" rel="noopener">LDA API (lda.gov)</a> ·
+      <a href="https://www.sec.gov/edgar" rel="noopener">SEC EDGAR</a> ·
+      hypothetical research tool, not investment advice.
+    </p>
+  </footer>
+</body>
+</html>

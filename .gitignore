@@ -1,0 +1,12 @@
+# Data caches (large, reproducible from public APIs)
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# OS/editor
+.DS_Store
+Thumbs.db
